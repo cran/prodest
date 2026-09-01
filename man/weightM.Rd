@@ -48,7 +48,7 @@
 }
 %%%%%%%%% DETAILS %%%%%%%%%
 \details{
-  \code{weightM()} accepts at least 7 inputs: Y, X1, X2, Z1, Z2, betas and numR. With these, computes the optimal weighting matrix in a system GMM framework, i.e. W* = sigma*Z'Z. If it is called during the first stage, it returns W*, otherwise will return an estimate of the parameters' standard errors, i.e., the square root of the diagonal of the variance-covariance matrix: 1/N( (X'Z) W* (Z'X) )^{-1}.
+  \code{weightM()} accepts at least 7 inputs: Y, X1, X2, Z1, Z2, betas and numR. With these, computes the optimal weighting matrix in a system GMM framework, i.e., \eqn{W^* = \sigma Z^\top Z}{W* = sigma Z'Z}. If it is called during the first stage, it returns W*, otherwise will return an estimate of the parameters' standard errors, i.e., the square root of the diagonal of the variance-covariance matrix \eqn{N^{-1} [(X^\top Z) W^* (Z^\top X)]^{-1}}{1/N [(X'Z) W* (Z'X)]^-1}.
 }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

@@ -9,9 +9,9 @@
   This method allows the user to print a table with a summary of the results within an \code{S4} \link{prod} object: the parameter estimates, the method, the number of observations, the time elapsed, the number of bootstrap repetitions, the first stage estimates and the starting points.
 }
 %%%%%%%%%%%%%%%% USAGE %%%%%%%%%%%%%%%%%%%
-%\usage{
-%  summary(object, ...)
-%}
+\usage{
+  \S4method{summary}{prod}(object, ...)
+}
 %%%%%%%%%%%%%%%% ARGUMENTS %%%%%%%%%%%%%%%%%%%
 \arguments{
   %

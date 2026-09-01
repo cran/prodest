@@ -20,7 +20,7 @@
 }
 %%%%%%%%% DETAILS %%%%%%%%%
 \details{
-  \code{checkM()} accepts one input and - if code{input} is a matrix - returns it without column names, otherwise transforms it into a matrix and returns it without column names.
+  \code{checkM()} accepts one input and - if \code{input} is a matrix - returns it without column names, otherwise transforms it into a matrix and returns it without column names.
 }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

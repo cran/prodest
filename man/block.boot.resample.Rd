@@ -4,7 +4,8 @@
 \title{Cluster Bootstrap Resampling}
 %%%%%%%%%%%%%%%% DESCRIPTION %%%%%%%%%%%%%%%%%%%
 \description{
-  Function to generate R vectors of resampled IDs. It works reshuffling the row number of the original data - which is stored in the input \code{idvar} along with the relative IDs. The output is a list (N_{i}x1xR), where N_{i} is a random number depending on the reshuffle.
+  Generate row indices for an individual-level block bootstrap of panel data.
+  All observations belonging to a sampled individual are kept together.
 }
 %%%%%%%%% USAGE %%%%%%%%%%%
 \usage{
@@ -12,19 +13,26 @@
 }
 %%%%%%%%% ARGUMENTS %%%%%%%%%%%
 \arguments{
-  %
   \item{idvar}{
-    Vector of IDs to be resampled.
+    One-column vector, matrix or data frame of panel identifiers. Numeric,
+    character and factor labels are accepted.
   }
-  %
   \item{R}{
-    Number of samples to be computed.
+    Positive integer giving the number of bootstrap samples.
   }
-  %
 }
 %%%%%%%%% DETAILS %%%%%%%%%
 \details{
-  \code{block.boot.resample()} accepts two inputs: a vector of IDs - i.e., the vector of panel identifier - and the number of resamplings. For each resampling, it reshuffles the IDs and outputs a vector whose row number is newly-created 'bootstrap' ID, while the value of each cell is the relative row to be reshuffled. This way, each individual can be sampled multiple times, keeping all her number of observations, without generating duplicates.
+  For every replication, the function samples the distinct panel identifiers
+  with replacement. It returns a list of one-column integer matrices. Matrix
+  values are row positions in the original data, while row names are newly
+  generated sequential identifiers for the resampled panels. Consequently, a
+  source panel may be selected more than once without merging its copies.
+}
+%%%%%%%%% VALUE %%%%%%%%%
+\value{
+  A list of length \code{R}. Each element is a one-column integer matrix of
+  resampled row positions with bootstrap panel identifiers stored as row names.
 }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

@@ -2,45 +2,30 @@
 \docType{data}
 \alias{chilean}
 %%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%
-\title{Data: Chilean firm-level production data 1986-1996}
+\title{Data: Chilean firm-level production data, 1996--2006}
 %%%%%%%%%%%%%%%% DESCRIPTION %%%%%%%%%%%%%%%%%%%
 \description{
-  Sectoral subsample of Chilean firm-level production data 1986-1996.
+  Sectoral subsample of Chilean firm-level production data covering 1996--2006.
 }
 %%%%%%%%%%%%%%%% USAGE %%%%%%%%%%%%%%%%%%%
 \usage{data("chilean")}
 %%%%%%%%%%%%%%%% FORMAT %%%%%%%%%%%%%%%%%%%
-\format{A \link{data.frame} object containing 9 variables with production-related data.}
-%%%%%%%%% VALUEs %%%%%%%%%%%
-\value{
-  \item{Y}{
-    vector of log(outcome) - Value added.}
-  %
-  \item{sX}{
-    vector of log(capital).}
-  %
-  \item{fX}{
-    matrix of log(skilled labor) and log(unskilled labor).}
-  %
-  \item{cX}{
-    vector of log(water).}
-  %
-  \item{pX}{
-    vector of log(electricity).}
-  %
-  \item{inv}{
-    vector of log(investment).}
-  %
-  \item{idvar}{
-    vector of panel identifier.}
-  %
-  \item{timevar}{
-    vector of time.}
-  %
+\format{
+  A \link{data.frame} with 2,544 observations and 8 variables:
+  \describe{
+    \item{Y}{Log value added.}
+    \item{sX}{Log capital.}
+    \item{fX1}{Log skilled labour.}
+    \item{fX2}{Log unskilled labour.}
+    \item{pX}{Log materials.}
+    \item{inv}{Log investment.}
+    \item{idvar}{Firm identifier.}
+    \item{timevar}{Year.}
+  }
 }
 %%%%%%%%% REFERENCES %%%%%%%%%
 \references{
-  \url{http://www.ine.cl/canales/chile_estadistico/estadisticas_economicas/industria/series_estadisticas/series_estadisticas_enia.php}
+  Instituto Nacional de Estadisticas de Chile, Encuesta Nacional Industrial Anual (ENIA).
 }
 %%%%%%%%% KEYWORDS %%%%%%%%%
 \keyword{datasets}

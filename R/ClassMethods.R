@@ -43,7 +43,7 @@ setMethod("show", "prod", function(object){
 # end of show method
 
 # Summary method #
-setMethod("summary", "prod", function(object){
+setMethod("summary", "prod", function(object, ...){
 
   Pars = object@Estimates$pars
   namePars = names(Pars)

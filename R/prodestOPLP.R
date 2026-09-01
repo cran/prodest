@@ -9,6 +9,8 @@ prodestOP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   sX <- checkM(sX)
   pX <- checkM(pX)
   idvar <- checkM(idvar)
+  idvar.original <- idvar
+  idvar.internal <- .panel_id_code(idvar)
   timevar <- checkM(timevar)
   snum <- ncol(sX) # find the number of input variables
   fnum <- ncol(fX)
@@ -50,7 +52,7 @@ prodestOP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   for (i in 1:snum) {
     lag.sX[, i] = lagPanel(sX[, i], idvar = idvar, timevar = timevar)
   }
-  data <- suppressWarnings(as.matrix(data.frame(state = sX, lag.sX = lag.sX, free = fX, Y = Y, idvar = idvar, # generate the matrix of data
+  data <- suppressWarnings(as.matrix(data.frame(state = sX, lag.sX = lag.sX, free = fX, Y = Y, idvar = idvar.internal, # generate the matrix of data
                                                 timevar = timevar, regvars = regvars, Pr.hat = Pr.hat)))
   if (!is.null(cX)) {
     data <- suppressWarnings(as.matrix(data.frame(data, cX = cX)))
@@ -62,7 +64,7 @@ prodestOP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
     nCores = NULL
     boot.betas <- matrix(unlist(lapply(boot.indices, finalOPLP, data = data, fnum = fnum, snum = snum, cnum = cnum,
                                        opt = opt, theta0 = theta0, boot = TRUE, tol = tol, att = att)), ncol = fnum+snum+cnum, byrow = TRUE) # use the indices and pass them to the final function (reshape the data)
-  } else { # set up the cluster: send the lag Panel and the data.table libraries to clusters
+  } else { # set up the cluster: send the lag Panel and the package to clusters
     nCores = length(cluster)
     clusterEvalQ(cl = cluster, library(prodest))
     boot.betas <- matrix(unlist(parLapply(cl = cluster, boot.indices, finalOPLP, data = data,
@@ -81,7 +83,7 @@ prodestOP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   out <- new("prod",
              Model = list(method = 'OP', FSbetas = betas$FSbetas, boot.repetitions = R, elapsed.time = elapsedTime,
                           theta0 = theta0 , opt = opt, opt.outcome = betas$opt.outcome, nCores = nCores),
-             Data = list(Y = Y, free = fX, state = sX, proxy = pX, control = cX, idvar = idvar, timevar = timevar,
+             Data = list(Y = Y, free = fX, state = sX, proxy = pX, control = cX, idvar = idvar.original, timevar = timevar,
                          FSresiduals = betas$FSresiduals),
              Estimates = list(pars = betas$betas, std.errors = boot.errors))
   return(out)
@@ -97,6 +99,8 @@ prodestLP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   sX <- checkM(sX)
   pX <- checkM(pX)
   idvar <- checkM(idvar)
+  idvar.original <- idvar
+  idvar.internal <- .panel_id_code(idvar)
   timevar <- checkM(timevar)
   snum <- ncol(sX) # find the number of input variables
   fnum <- ncol(fX)
@@ -138,7 +142,7 @@ prodestLP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   for (i in 1:snum) {
     lag.sX[, i] = lagPanel(sX[, i], idvar = idvar, timevar = timevar)
   }
-  data <- suppressWarnings(as.matrix(data.frame(state = sX, lag.sX = lag.sX, free = fX, Y = Y, idvar = idvar, # generate the matrix of data
+  data <- suppressWarnings(as.matrix(data.frame(state = sX, lag.sX = lag.sX, free = fX, Y = Y, idvar = idvar.internal, # generate the matrix of data
                                                 timevar = timevar, regvars = regvars, Pr.hat = Pr.hat)))
   if (!is.null(cX)) {
     data <- suppressWarnings(as.matrix(data.frame(data, cX = cX)))
@@ -172,7 +176,7 @@ prodestLP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
   out <- new("prod",
              Model = list(method = 'LP', FSbetas = betas$FSbetas, boot.repetitions = R, elapsed.time = elapsedTime,
                           theta0 = theta0 , opt = opt, opt.outcome = betas$opt.outcome, nCores = nCores),
-             Data = list(Y = Y, free = fX, state = sX, proxy = pX, control = cX, idvar = idvar, timevar = timevar,
+             Data = list(Y = Y, free = fX, state = sX, proxy = pX, control = cX, idvar = idvar.original, timevar = timevar,
                          FSresiduals = betas$FSresiduals),
              Estimates = list(pars = betas$betas, std.errors = boot.errors))
   return(out)
@@ -181,13 +185,9 @@ prodestLP <- function(Y, fX, sX, pX, idvar, timevar, R = 20, cX = NULL, opt = 'o
 
 # function to estimate and to bootstrap OP / LP #
 finalOPLP <- function(ind, data, fnum, snum, cnum, opt, theta0, boot, tol, att){
-  if (sum(as.numeric(ind)) == length(ind)){ # if the ind variable is not always TRUE
-    newid <- data[ind, 'idvar', drop = FALSE]
-  } else {
-    newid <- as.matrix(as.numeric(rownames(ind)))
-    ind <- as.matrix(ind)
-  }
-  data <- data[ind,] # change the index according to bootstrapped indices
+  sampled <- .prepare_panel_resample(ind, data)
+  data <- sampled$data
+  newid <- sampled$idvar
   first.stage <- lm(data[,'Y'] ~ data[,grepl('regvars', colnames(data))], na.action = na.exclude)
   fX <- data[,grepl('free', colnames(data)), drop = FALSE]
   phi <- fitted(first.stage) # generate the fitted values of the first stage

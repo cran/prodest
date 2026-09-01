@@ -50,17 +50,19 @@ panelSim <- function(N = 1000, T = 100, alphaL = .6, alphaK = .4, DGP = 1, rho =
   # Various components of long expression for optimal investment choice (end of Appendix Section 7.3)
   squarebracketterm = (alphaL^(alphaL/(1-alphaL)))*exp(0.5*alphaL^2*sigoptl^2) - (alphaL^(1/(1-alphaL)))*exp(0.5*sigoptl^2)
   const1 = disc * (alphaK/(1-alphaL)) * (exp(alpha0)^(1/(1-alphaL))) * squarebracketterm
-  vec1 = (disc*(1-delta))^seq(100)
-  vec2 = cumsum( rholnw^(2*seq(100)) ) # Cumulative sum done through an upper triangular matrix --> check
-  vec3 = rbind(sigxi^2 * 0,cumsum(rho^(2*(seq(100)-1))) )
-  expterm3 = exp( 0.5 * ((-alphaL)/(1-alphaL))^2 * sigxilnw^2 * vec2 );
-  expterm4 = exp( 0.5 * (1/(1-alphaL))^2 * rhosecond^2 * ((sigxifirst^2)*rho^(2*seq(100)) + vec3) )
+  horizon <- 100L
+  steps <- seq_len(horizon)
+  vec1 = (disc*(1-delta))^(steps - 1L)
+  vec2 = cumsum(rholnw^(2*steps)) # Cumulative sum done through an upper triangular matrix --> check
+  vec3 = sigxi^2 * c(0, cumsum(rho^(2*(seq_len(horizon - 1L) - 1L))))
+  expterm3 = exp(0.5 * ((-alphaL)/(1-alphaL))^2 * sigxilnw^2 * vec2)
+  expterm4 = exp(0.5 * (1/(1-alphaL))^2 * rhosecond^2 * ((sigxifirst^2)*rho^(2*steps) + vec3))
   expterm5 = exp((1/(1-alphaL))*(1/2)*sigxisecond^2)
   investmat = matrix(NA,N,T)
   for (i in 1:N) {
     for (t in 1:T) {
-      expterm1 = exp( (1/(1-alphaL))*omgdata[i,t]*(rho^seq(100)) ) # first term in exponent in second line
-      expterm2 = exp( ((-alphaL)/(1-alphaL))*lnwdata[i,t]*(rholnw^seq(100)) ) # second term in exponent in second line
+      expterm1 = exp( (1/(1-alphaL))*omgdata[i,t]*(rho^steps) ) # first term in exponent in second line
+      expterm2 = exp( ((-alphaL)/(1-alphaL))*lnwdata[i,t]*(rholnw^steps) ) # second term in exponent in second line
       investmat[i,t] = oneoverbiadj[i]*const1*expterm5*sum(vec1*expterm1*expterm2*expterm3*expterm4)  # optimal investment
       if (t >= 2) {
         lnkdata[i,t] = log( (1-delta)*exp(lnkdata[i,t-1]) + (1-0*runif(1))*investmat[i,t-1] )

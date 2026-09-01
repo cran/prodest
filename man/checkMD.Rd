@@ -20,7 +20,7 @@
   }
 %%%%%%%%% DETAILS %%%%%%%%%
   \details{
-    \code{checkMD()} accepts one input and - if code{input} is a matrix - returns it without column names, otherwise transforms it into a matrix and returns it without column names. In case any of the elements of input are different from 0 or 1, it stops the routine and throws an error.
+    \code{checkMD()} accepts one input and - if \code{input} is a matrix - returns it without column names, otherwise transforms it into a matrix and returns it without column names. In case any of the elements of input are different from 0 or 1, it stops the routine and throws an error.
   }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

@@ -48,35 +48,37 @@
 }
 %%%%%%%%% VALUE %%%%%%%%%%%
 \value{
-  \eqn{panelSim()} returns a \code{data.frame} with 7 variables:
-  \itemize{
-    \item{\eqn{idvar}}{
-      ID codes from 1 to N (by default \eqn{N = 1000}).
-    }
-    \item{\eqn{timevar}}{
-      time variable ranging 1 to \eqn{round(T*0.1)} (by default \eqn{T = 100} and \eqn{max(timevar) = 10}).
-    }
-    \item{\eqn{Y}}{
-      log output value added variable
-    }
-    \item{\eqn{sX}}{
-      log state variable
-    }
-    \item{\eqn{fX}}{
-      log free variable
-    }
-    \item{\eqn{pX1}}{
-      log proxy variable - no measurement error
-    }
-    \item{\eqn{pX2}}{
-      log proxy variable - \eqn{\sigma_{measurementerror}= .1}
-    }
-    \item{\eqn{pX3}}{
-      log proxy variable - \eqn{\sigma_{measurementerror}= .2}
-    }
-    \item{\eqn{pX4}}{
-      log proxy variable - \eqn{\sigma_{measurementerror}= .5}
-    }
+  A \code{data.frame} with nine variables:
+  \item{idvar}{
+    ID codes from 1 to \eqn{N} (by default \eqn{N = 1000}).
+  }
+  \item{timevar}{
+    Time variable ranging from 1 to \code{round(T * 0.1)} (by default
+    \eqn{T = 100} and \code{max(timevar) = 10}).
+  }
+  \item{Y}{
+    Log output value-added variable.
+  }
+  \item{sX}{
+    Log state variable.
+  }
+  \item{fX}{
+    Log free variable.
+  }
+  \item{pX1}{
+    Log proxy variable with no measurement error.
+  }
+  \item{pX2}{
+    Log proxy variable with measurement-error standard deviation
+    \eqn{\sigma = 0.1}.
+  }
+  \item{pX3}{
+    Log proxy variable with measurement-error standard deviation
+    \eqn{\sigma = 0.2}.
+  }
+  \item{pX4}{
+    Log proxy variable with measurement-error standard deviation
+    \eqn{\sigma = 0.5}.
   }
 }
 %%%%%%%%% AUTHOR %%%%%%%%%%%

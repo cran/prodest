@@ -52,7 +52,7 @@
 }
 %%%%%%%%% DETAILS %%%%%%%%%
 \details{
-  \code{gOPLP()} estimates the second stage of OP and LP routines. It accepts 7 inputs, generates and optimizes over the group of moment functions E(e_{it}X^{k}_{it}).
+  \code{gOPLP()} estimates the second stage of OP and LP routines. It accepts 7 inputs, generates and optimizes over the group of moment functions \eqn{E(e_{it} X^k_{it})}{E(e_it X_it^k)}.
 }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

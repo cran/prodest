@@ -10,6 +10,58 @@ checkM <- function(input){ # , inputname = NA
 }
 # end check matrix fun #
 
+# Convert arbitrary one-column panel identifiers to consecutive integer codes.
+# Character and factor labels are accepted.  The codes are used only in
+# internal numeric work matrices; fitted objects retain the original labels.
+.panel_id_code <- function(idvar){
+  id_matrix <- if (is.matrix(idvar)) idvar else as.matrix(idvar)
+  if (ncol(id_matrix) != 1L) {
+    stop("idvar must contain exactly one column")
+  }
+
+  ids <- as.vector(id_matrix)
+  if (length(ids) == 0L) {
+    stop("idvar must contain at least one observation")
+  }
+  if (any(is.na(ids))) {
+    stop("idvar must not contain missing values")
+  }
+
+  out <- matrix(match(ids, unique(ids)), ncol = 1L)
+  rownames(out) <- rownames(id_matrix)
+  out
+}
+
+# Apply either an ordinary logical row selection or a block-bootstrap index.
+.prepare_panel_resample <- function(ind, data){
+  if (is.logical(ind)) {
+    if (length(ind) == 1L) {
+      ind <- rep(ind, nrow(data))
+    }
+    if (length(ind) != nrow(data) || any(is.na(ind))) {
+      stop("logical ind must have length one or one value per data row")
+    }
+    rows <- which(ind)
+    newid <- data[rows, "idvar", drop = FALSE]
+  } else {
+    rows <- as.integer(ind)
+    if (length(rows) == 0L || any(is.na(rows)) ||
+        any(rows < 1L | rows > nrow(data))) {
+      stop("ind contains invalid row indices")
+    }
+    bootstrap_ids <- rownames(ind)
+    if (is.null(bootstrap_ids) || length(bootstrap_ids) != length(rows)) {
+      stop("bootstrap indices must carry resampled panel IDs as row names")
+    }
+    newid <- matrix(as.numeric(bootstrap_ids), ncol = 1L)
+    if (any(is.na(newid))) {
+      stop("bootstrap panel IDs must be numeric")
+    }
+  }
+
+  list(data = data[rows, , drop = FALSE], idvar = newid)
+}
+
 # function to check and change input - dummy variables - to matrix #
 checkMD <- function(input){ # , inputname = NA
   if (!is.matrix(input)) {
@@ -27,13 +79,52 @@ checkMD <- function(input){ # , inputname = NA
 # end check matrix fun #
 
 # function to lag variables within a panel #
-lagPanel <- function( idvar, timevar, value ){
-  df <- data.frame( idvar, timevar, value)
-  last.time <- df %>% filter(!is.na(timevar)) %>%
-    mutate(timevar = timevar + 1, lagged_value = value, value = NULL)
-  out <- as.matrix(df %>% left_join(last.time, by = c("idvar", "timevar")))[,4]
-  colnames( out ) <- NULL
-  return( out )
+lagPanel <- function(idvar, timevar, value){
+  idvar <- as.vector(idvar)
+  timevar <- as.vector(timevar)
+
+  if (length(idvar) != length(timevar)) {
+    stop("idvar and timevar must have the same length")
+  }
+  if (!is.numeric(timevar)) {
+    stop("timevar must be numeric")
+  }
+
+  vector_input <- is.null(dim(value))
+  value_matrix <- if (vector_input) matrix(value, ncol = 1L) else as.matrix(value)
+
+  if (nrow(value_matrix) != length(idvar)) {
+    stop("value must have one row for each idvar/timevar observation")
+  }
+
+  valid <- !is.na(idvar) & !is.na(timevar)
+  source_key <- rep(NA_character_, length(idvar))
+  source_key[valid] <- paste(idvar[valid], timevar[valid], sep = "\r")
+
+  if (anyDuplicated(source_key[valid])) {
+    stop("idvar and timevar must uniquely identify observations")
+  }
+
+  target_key <- rep(NA_character_, length(idvar))
+  target_key[valid] <- paste(idvar[valid], timevar[valid] - 1, sep = "\r")
+  source_row <- match(target_key, source_key)
+
+  out <- value_matrix[source_row, , drop = FALSE]
+  out[!valid, ] <- NA
+
+  if (vector_input) {
+    out <- as.vector(out[, 1L])
+    names(out) <- names(value)
+    return(out)
+  }
+
+  input_names <- colnames(value_matrix)
+  if (is.null(input_names)) {
+    input_names <- paste0("V", seq_len(ncol(value_matrix)))
+  }
+  colnames(out) <- paste0("l", input_names)
+  rownames(out) <- rownames(value_matrix)
+  out
 }
 # end of lag panel #
 
@@ -45,20 +136,45 @@ withinvar <- function(inmat){
 # end of within variance function #
 
 # boot resampling on IDs: bootstrapping on individuals #
-block.boot.resample <- function( idvar, R ){
-  unique.ids <- unique(idvar) # find the unique values of panels in order to reshape the data
-  panel.time.indices <- apply(unique.ids, 1, function(x) {return(list(which(idvar == x)))}) # find the time indices for each panel
-  seq.indices <- 1:length(unique.ids) # the panel.time.indices list is indexed with sequential numbers: we mimic it
-  boot.panel.id <- replicate(R, sample(seq.indices, replace = TRUE)) # generate a matrix of new IDs - R times
-  new.indices <- list() # generate the matrix of the new indices
-  ind <- 1:length(unique.ids)
-  for (r in 1:R){ # for each boot rep we generate a vector of indices with rownames equal to a new - and fake - ID
-    new.indices[[r]] <- cbind(unlist(mapply(function(x,y) {
-      names(panel.time.indices[[x]][[1]]) <- rep(y,length(panel.time.indices[[x]][[1]]))
-      return(list(panel.time.indices[[x]][[1]]))
-    }, boot.panel.id[,r], ind))) # return a fake ID (sequential number) as row name and the index referring to the true ID
+block.boot.resample <- function(idvar, R){
+  id_matrix <- if (is.matrix(idvar)) idvar else as.matrix(idvar)
+  if (ncol(id_matrix) != 1L) {
+    stop("idvar must contain exactly one column")
   }
-  return(new.indices)
+
+  ids <- as.vector(id_matrix)
+  if (length(ids) == 0L) {
+    stop("idvar must contain at least one observation")
+  }
+  if (any(is.na(ids))) {
+    stop("idvar must not contain missing values")
+  }
+  if (length(R) != 1L || is.na(R) || !is.finite(R) ||
+      R < 1L || R != as.integer(R)) {
+    stop("R must be a positive integer")
+  }
+  R <- as.integer(R)
+
+  unique_ids <- unique(ids)
+  panel_indices <- lapply(unique_ids, function(x) which(ids == x))
+  n_panels <- length(panel_indices)
+
+  lapply(seq_len(R), function(r) {
+    sampled_panels <- sample.int(n_panels, size = n_panels, replace = TRUE)
+    sampled_indices <- unlist(panel_indices[sampled_panels], use.names = FALSE)
+    bootstrap_ids <- unlist(
+      Map(function(new_id, sampled_panel) {
+        rep.int(new_id, length(panel_indices[[sampled_panel]]))
+      }, seq_along(sampled_panels), sampled_panels),
+      use.names = FALSE
+    )
+
+    matrix(
+      sampled_indices,
+      ncol = 1L,
+      dimnames = list(as.character(bootstrap_ids), NULL)
+    )
+  })
 }
 # end of block bootstrap function #
 

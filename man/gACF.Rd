@@ -44,7 +44,7 @@
   }
 %%%%%%%%% DETAILS %%%%%%%%%
   \details{
-    \code{gACF()} estimates the second stage of ACF routine. It accepts 7 inputs, generates and optimizes over the group of moment functions E(xi_{it}Z^{k}_{it}).
+    \code{gACF()} estimates the second stage of ACF routine. It accepts 7 inputs, generates and optimizes over the group of moment functions \eqn{E(\xi_{it} Z^k_{it})}{E(xi_it Z_it^k)}.
   }
 %%%%%%%%%%%%%%%% AUTHOR %%%%%%%%%%%%%%%%%%%
 \author{Gabriele Rovigatti}

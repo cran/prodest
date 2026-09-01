@@ -27,7 +27,7 @@
     the vector/matrix/dataframe of control variables. By default \code{cX= NULL}.}
   %
   \item{idvar  }{
-    the vector/matrix/dataframe identifying individual panels.}
+    a one-column vector/matrix/dataframe identifying individual panels; numeric, character and factor labels are accepted.}
   %
   \item{timevar}{
     the vector/matrix/dataframe identifying time.}
@@ -57,7 +57,7 @@
     \itemize{
       \item \eqn{y_{it} = \alpha + w_{it}\beta + k_{it}\gamma + \omega_{it} + \epsilon_{it}}
     }
-    where \eqn{y_{it}} is the (log) output, w_{it} a 1xJ vector of (log) free variables, k_{it} is a 1xK vector of state variables and \eqn{\epsilon_{it}} is a normally distributed idiosyncratic error term.
+    where \eqn{y_{it}} is the (log) output, \eqn{w_{it}} is a \eqn{1 \times J}{1 x J} vector of (log) free variables, \eqn{k_{it}} is a \eqn{1 \times K}{1 x K} vector of state variables, and \eqn{\epsilon_{it}} is a normally distributed idiosyncratic error term.
     The unobserved technical efficiency parameter \eqn{\omega_{it}} evolves according to a first-order Markov process:
       \itemize{
         \item \eqn{\omega_{it} = E(\omega_{it} | \omega_{it-1}) + u_{it} = g(\omega_{it-1}) + u_{it}}
@@ -134,13 +134,12 @@ and \eqn{g(.)} is typically left unspecified and approximated by a \eqn{n^{th}} 
     require(prodest)
 
     ## Chilean data on production.
-    ## Publicly available at http://www.ine.cl/canales/chile_estadistico/estadisticas_
-    ## economicas/industria/series_estadisticas/series_estadisticas_enia.php
+    ## Source: Instituto Nacional de Estadisticas de Chile (ENIA).
 
     data(chilean)
 
     # we fit a model with two free (skilled and unskilled), one state (capital)
-    # and one proxy variable (electricity)
+    # and one proxy variable (materials)
 
     set.seed(154673)
     LP.fit <- prodestLP(chilean$Y, fX = cbind(chilean$fX1, chilean$fX2), chilean$sX,

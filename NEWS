@@ -1,3 +1,28 @@
+Changes in Version 1.0.2
+
+  o fixed ACF estimation with control variables (#11) by carrying controls through
+    the first-stage regressors, second-stage regressors, lags and instruments
+
+  o added support for character and factor panel identifiers (#20) in OP, LP and ACF
+    estimation and in the panel block bootstrap
+
+  o removed the unsupported duplicate cX column from the chilean data (#22) and
+    corrected its years and variable descriptions
+
+  o restored the released prodestOP interface and removed unfinished, unused helper code
+
+  o fixed lagPanel for vector inputs and added matrix-safe lagging
+
+  o fixed a panelSim horizon-length mismatch that generated recycling warnings
+
+  o replaced an obsolete data-source URL and canonicalized project URLs
+
+  o added Authors@R metadata and modernized the CITATION file
+
+  o corrected Rd markup for compatibility with current R-devel
+
+  o restored the documented usage for the summary method
+
 Changes in Version 1.0.1
 
   o changed prodestWRDG - implemented the IV version

@@ -1,17 +1,32 @@
 citHeader("To cite package 'prodest' in publications use:")
 
-citEntry(entry="Manual",
-         title = "prodest: Production Function Estimation",
-         author = personList(person(given="Gabriele", family="Rovigatti")),
-         year = "2017",
-         note = "R package version 1.0.1",
-         textVersion = "Rovigatti, G. (2017). prodest: Production Function Estimation in R. R package.")
-        
+bibentry(
+  bibtype = "Manual",
+  title = "prodest: Production Function Estimation",
+  author = person(given = "Gabriele", family = "Rovigatti"),
+  year = "2026",
+  note = "R package version 1.0.2",
+  textVersion = paste(
+    "Rovigatti, G. (2026).",
+    "prodest: Production Function Estimation.",
+    "R package version 1.0.2."
+  )
+)
 
-
-citEntry(entry="Article",
-         title = "Production Function Estimation in R: The prodest Package",
-         author = personList(person(given="Gabriele", family="Rovigatti")),
-         year = "2017",
-         journal = "Working paper",
-         textVersion = "Rovigatti, G. (2018). Production Function Estimation in R: The prodest Package. Working paper.")
+bibentry(
+  bibtype = "Article",
+  title = "Production Function Estimation in R: The prodest Package",
+  author = person(given = "Gabriele", family = "Rovigatti"),
+  year = "2017",
+  journal = "Journal of Open Source Software",
+  volume = "2",
+  number = "18",
+  pages = "371",
+  doi = "10.21105/joss.00371",
+  textVersion = paste(
+    "Rovigatti, G. (2017).",
+    "Production Function Estimation in R: The prodest Package.",
+    "Journal of Open Source Software, 2(18), 371.",
+    "doi:10.21105/joss.00371."
+  )
+)
